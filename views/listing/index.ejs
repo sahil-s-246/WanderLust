@@ -1,14 +1,20 @@
 <% layout("/Layouts/boilerplate") %>
-
     <body>
         <h3>All Listings.</h3>
+        <input
+      type="text"
+      id="searchBox"
+      value=""
+      placeholder="search for snippets"
+      class="text-base mb-5 sm:my-0 px-3 py-1 font-semibold placeholder:text-gray-400 placeholder:text-base rounded-lg focus:outline-none bg-inherit border-2 border-slate-600"
+    />
         <!-- <form method="GET" action="/listing/new"><button>Create Listing</button></form> -->
         <div class="row row-cols-lg-3 row-cols-md-2 row-cols-sm-1">
         <%for(listings of allListings){%>
-            <div class="card col" >
+            <div class="card-col" >
             <a href="/listing/<%=listings._id%>" class="listing-links">
             <img src="<%=listings.image%>" class="card-img-top" alt="Listing Image" style="height:20rem">
-            <div class="card-img-overlay"></div>
+            
             <div class="card-body">
                 <h5 class="card-title"><strong><%=listings.title%></strong></h5>
                 <p class="card-text">&#8377;<%=listings.price.toLocaleString("en-IN")%> /Night<br>
@@ -19,5 +25,30 @@
         </div>
         <%}%>
     </div>
+    <style>.hidden{display: none;}</style>
+    <script>
+        let searchBox = document.querySelector<HTMLInputElement>("#searchBox");
+
+searchBox.addEventListener("input", () => {
+
+  const key = searchBox.value;
+  const cards = document.querySelectorAll(".card-col");
+    cards.forEach((card) => {
+      if (card.querySelector(".card-body a h5 strong").innerHTML.toLowerCase().includes(key.toLowerCase())) {
+        card.classList.add("hidden");
+      } else {
+        card.classList.remove("hidden");
+      }
+    });
+
+
+
+}); // Debounce search logic with 250ms delay
+
+
+
+    </script>
 
     </body>
+
+    
