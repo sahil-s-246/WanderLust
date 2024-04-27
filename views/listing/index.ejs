@@ -5,9 +5,74 @@
       type="text"
       id="searchBox"
       value=""
-      placeholder="search for snippets"
+      placeholder="search for listings"
       class="text-base mb-5 sm:my-0 px-3 py-1 font-semibold placeholder:text-gray-400 placeholder:text-base rounded-lg focus:outline-none bg-inherit border-2 border-slate-600"
     />
+<br><br>
+  <h4>Ask Mistral AI</h4>
+  <form id="prompt-form">
+    <label for="prompt">Prompt:</label>
+    <textarea id="prompt" name="prompt"></textarea>
+    <button type="submit">Ask</button>
+  </form>
+  <h5 id="answer"></h5>
+
+  <script>
+    const form = document.getElementById('prompt-form');
+    const promptInput = document.getElementById('prompt');
+    const answerElement = document.getElementById('answer');
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+
+      const promptText = promptInput.value;
+
+      const data = {
+        "inputs": promptText
+      };
+
+      try {
+        const response = await query(data);
+        const answer = response[0].generated_text;
+        answerElement.textContent = answer;
+      } catch (error) {
+        console.error(error);
+        answerElement.textContent = "Error: Could not complete your request.";
+      }
+    });
+
+    async function query(data) {
+      const response = await fetch(
+        "https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.2",
+        {
+          headers: { Authorization: "Bearer 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","Content-Type": "application/json" },
+          method: "POST",
+          body: JSON.stringify(data),
+        }
+      );
+      const result = await response.json();
+      return result;
+    }
+    let searchBox = document.querySelector("#searchBox");
+
+    searchBox.addEventListener("input", () => {
+
+      const key = searchBox.value;
+      const cards = document.querySelectorAll(".card-col");
+        cards.forEach((card) => {
+          if (card.querySelector("#master").innerHTML.toLowerCase().includes(key.toLowerCase())) {
+            card.classList.remove("hidden");
+          } else {
+            card.classList.add("hidden");
+          }
+        });
+
+
+
+}); // Debounce search logic with 250ms delay
+  </script>
+
+
         <!-- <form method="GET" action="/listing/new"><button>Create Listing</button></form> -->
         <div class="row row-cols-lg-3 row-cols-md-2 row-cols-sm-1">
         <%for(listings of allListings){%>
@@ -15,8 +80,8 @@
             <a href="/listing/<%=listings._id%>" class="listing-links">
             <img src="<%=listings.image%>" class="card-img-top" alt="Listing Image" style="height:20rem">
             
-            <div class="card-body">
-                <h5 class="card-title"><strong><%=listings.title%></strong></h5>
+            <div cla  ss="card-body">
+                <h5 class="card-title"><strong id="master"><%=listings.title%></strong></h5>
                 <p class="card-text">&#8377;<%=listings.price.toLocaleString("en-IN")%> /Night<br>
                 </p>
                 <a href="#" class="btn btn-primary">Go somewhere</a>
@@ -25,30 +90,7 @@
         </div>
         <%}%>
     </div>
-    <style>.hidden{display: none;}</style>
-    <script>
-        let searchBox = document.querySelector<HTMLInputElement>("#searchBox");
-
-searchBox.addEventListener("input", () => {
-
-  const key = searchBox.value;
-  const cards = document.querySelectorAll(".card-col");
-    cards.forEach((card) => {
-      if (card.querySelector(".card-body a h5 strong").innerHTML.toLowerCase().includes(key.toLowerCase())) {
-        card.classList.add("hidden");
-      } else {
-        card.classList.remove("hidden");
-      }
-    });
-
-
-
-}); // Debounce search logic with 250ms delay
-
-
-
-    </script>
 
     </body>
 
-    
+</html>
